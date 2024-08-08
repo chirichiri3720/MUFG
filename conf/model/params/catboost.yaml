@@ -1,0 +1,6 @@
+depth: 6
+iterations: 10000
+learning_rate: null
+random_strength: null
+bagging_temperature: null
+od_type: 'Iter'

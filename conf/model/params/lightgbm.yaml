@@ -1,0 +1,11 @@
+n_estimators: 10000
+max_depth: 6
+num_leaves: null
+learning_rate: null
+lambda_l1: null
+lambda_l2: null
+feature_fraction: null
+bagging_fraction: null
+bagging_freq: null
+min_child_samples: null
+min_data_in_leaf: null

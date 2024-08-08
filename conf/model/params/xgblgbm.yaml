@@ -1,0 +1,24 @@
+xgboost:
+  max_depth: 6
+  n_estimators: 10000
+  eta: null
+  min_child_weight: null
+  subsample: null
+  colsample_bytree: null
+  colsample_bylevel: null
+  gamma: null
+  alpha: null
+  lambda: null
+
+lightgbm:
+  n_estimators: 10000
+  max_depth: null
+  num_leaves: null
+  learning_rate: null
+  lambda_l1: null
+  lambda_l2: null
+  feature_fraction: null
+  bagging_fraction: null
+  bagging_freq: null
+  min_child_samples: null
+  min_data_in_leaf: null

@@ -1,0 +1,38 @@
+xgboost:
+  max_depth: 6
+  n_estimators: 10000
+  eta: null
+  min_child_weight: null
+  subsample: null
+  colsample_bytree: null
+  colsample_bylevel: null
+  gamma: null
+  alpha: null
+  lambda: null
+
+lightgbm:
+  max_depth: 6
+  n_estimators: 10000
+  num_leaves: null
+  learning_rate: null
+  lambda_l1: null
+  lambda_l2: null
+  feature_fraction: null
+  bagging_fraction: null
+  bagging_freq: null
+  min_child_samples: null
+  min_data_in_leaf: null
+
+catboost:
+  depth: 6
+  iterations: 10000
+  learning_rate: null
+  border_count: null
+  random_strength: null
+  bagging_temperature: null
+  # od_type: 'IncToDec'
+  od_type: 'Iter'
+  # od_wait: 10 
+  # subsample: null
+  # colsample_bylevel: null
+  # min_data_in_leaf: null
