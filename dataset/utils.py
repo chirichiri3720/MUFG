@@ -46,11 +46,13 @@ def make_calculate_two_features(train, test, continuous_columns):
     df = pd.concat([train, test])
 
     feature_columns = df[[
-        "RoomService",
-        "FoodCourt",
-        "ShoppingMall",
-        "Spa",
-        "VRDeck",
+        "int.rate",
+        "dti",
+        "fico",
+        "days.with.cr.line",
+        "inq.last.6mths",
+        "delinq.2yrs",
+        "pub.rec"
         ]]
 
     new_features = []

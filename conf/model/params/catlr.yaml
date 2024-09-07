@@ -3,9 +3,8 @@ iterations: 10000
 learning_rate: null
 random_strength: null
 bagging_temperature: null
-subsample: null
+# subsample: null
 # colsample_bylevel: null
-# l2_leaf_reg: 4
-# min_data_in_leaf : null
+# l2_leaf_reg: null
 
 od_type: 'Iter'

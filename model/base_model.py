@@ -8,7 +8,7 @@ from sklearn.metrics import (
     mean_absolute_error,
 )
 import numpy as np
-
+import pandas as pd
 
 class BaseClassifier:
     def __init__(self, input_dim, output_dim, model_config, verbose) -> None:
@@ -31,8 +31,7 @@ class BaseClassifier:
         y_pred = self.predict(X)
         results = {}
         results["ACC"] = accuracy_score(y, y_pred)
-        y_score = self.predict_proba(X)
-        y_score = y_score[:, 1]
+        y_score = self.predict_proba(X)[:, 1]
         results["AUC"] = roc_auc_score(y, y_score)
         results["Precision"] = precision_score(y, y_pred, average="micro", zero_division=0)
         results["Recall"] = recall_score(y, y_pred, average="micro", zero_division=0)
@@ -53,6 +52,9 @@ class BaseRegressor:
 
     def fit(self, X, y, eval_set):
         raise NotImplementedError()
+    
+    def predict_proba(self, X):
+        return self.model.predict_proba(X.values)
 
     def predict(self, X):
         return self.model.predict(X.values)
@@ -64,6 +66,12 @@ class BaseRegressor:
         results["MSE"] = mse
         results["MAE"] = mean_absolute_error(y, y_pred)
         results["RMSE"] = np.sqrt(mse)
+
+        thresholds=[0.5]
+        pred_labels = pd.cut(y_pred, bins=[-np.inf] + thresholds + [np.inf], 
+                             labels=[0, 1]).astype(int)
+        true_labels = y.astype(int)
+        results['AUC'] = roc_auc_score(true_labels,pred_labels)
         return results
 
     def feature_importance(self):

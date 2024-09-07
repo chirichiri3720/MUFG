@@ -27,7 +27,7 @@ catboost:
   depth: 6
   iterations: 10000
   learning_rate: null
-  border_count: null
+  # border_count: null
   random_strength: null
   bagging_temperature: null
   # od_type: 'IncToDec'

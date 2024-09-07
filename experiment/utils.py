@@ -9,10 +9,14 @@ import random
 from typing import Dict, Union
 
 import numpy as np
-from sklearn.metrics import accuracy_score, roc_auc_score, mean_squared_error, mean_absolute_error
+from sklearn.metrics import accuracy_score, roc_auc_score, mean_squared_error, mean_absolute_error, confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 import pandas as pd
 
+from PIL import Image
+import io
+
+THRESHOLDS = [0.5]
 
 def set_seed(seed: int = 42):
     random.seed(seed)
@@ -130,3 +134,43 @@ def plt_importance(feature_importance, name="importance"):
     plt.gca().invert_yaxis()
     plt_name = f"{name}.pdf"
     plt.savefig(plt_name)
+
+def plot_confusion_matrix(model, x_val, y_val, i_fold):
+    y_pred = model.predict(x_val)
+    pred_labels = pd.cut(y_pred, bins=[-np.inf] + THRESHOLDS + [np.inf], 
+                         labels=[0, 1]).astype('int32')
+    true_labels = y_val.astype(int)
+    cm = confusion_matrix(true_labels, pred_labels, labels=[0, 1])
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0, 1])
+    # グラフの作成
+    fig, ax = plt.subplots()
+    disp.plot(cmap=plt.cm.Blues, ax=ax)
+    ax.set_title(f"Confusion Matrix for fold {i_fold+1}")
+    # 画像をバッファに保存
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    plt.close()
+    buf.seek(0)
+    
+    return Image.open(buf)
+
+def concatenate_images(image_list):
+    # 画像リストが空の場合は処理を終了
+    if not image_list:
+        return None
+
+    # 画像を読み込み、サイズを取得
+    images = [img for img in image_list]
+    widths, heights = zip(*(img.size for img in images))
+    total_height = sum(heights)
+    max_width = max(widths)
+    
+    # 連結するためのキャンバスを作成
+    concatenated_image = Image.new('RGB', (max_width, total_height))
+    
+    y_offset = 0
+    for img in images:
+        concatenated_image.paste(img, (0, y_offset))
+        y_offset += img.size[1]
+    
+    return concatenated_image

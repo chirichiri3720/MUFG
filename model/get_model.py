@@ -1,6 +1,6 @@
 from experiment.utils import set_seed
 
-from .model import LightGBMClassifier, XGBoostClassifier, LightGBMRegressor, XGBoostRegressor, CatBoostClassifier
+from .model import LightGBMClassifier, XGBoostClassifier, LightGBMRegressor, XGBoostRegressor, CatBoostClassifier,LogisticRegressionClassifier,CatBoostRegressor
 from .ensemble import XGBLGBMClassifier, XGB10Classifier, XGB7LGBM7Classifier, XGBLRClassifier, XGBLGBMCATClassifier, CATSEEDClassifier, CATLRClassifier
 
 
@@ -26,6 +26,8 @@ def get_classifier(name, *, input_dim, output_dim, model_config, seed=42, verbos
         return CATSEEDClassifier(input_dim, output_dim, model_config, verbose)
     elif name == "catlr":
         return CATLRClassifier(input_dim, output_dim, model_config, verbose)
+    elif name == "logistic":
+        return LogisticRegressionClassifier(input_dim,output_dim,model_config,verbose,seed)
     else:
         raise KeyError(f"{name} is not defined.")
 
@@ -35,5 +37,7 @@ def get_regressor(name, *, input_dim, output_dim, model_config, seed=42, verbose
         return XGBoostRegressor(input_dim, output_dim, model_config, verbose, seed)
     elif name == "lightgbm":
         return LightGBMRegressor(input_dim, output_dim, model_config, verbose, seed)
+    elif name == "catboost":
+        return CatBoostRegressor(input_dim, output_dim, model_config, verbose, seed)
     else:
         raise KeyError(f"{name} is not defined.")

@@ -1,7 +1,11 @@
 import lightgbm as lgb
 import xgboost as xgb
 import catboost as cat
+import pandas as pd
+
 from sklearn.utils.validation import check_X_y
+
+from sklearn.linear_model import LogisticRegression
 
 from .base_model import BaseClassifier, BaseRegressor
 from .utils import f1_micro, f1_micro_lgb, binary_logloss
@@ -13,7 +17,7 @@ class XGBoostClassifier(BaseClassifier):
         self.model = xgb.XGBClassifier(
             objective="binary:logistic",  # 2値分類用のobjectiveに変更
             eval_metric="logloss",  # 2値分類なのでloglossを使用
-            early_stopping_rounds=50,
+            early_stopping_rounds=100,
             **self.model_config,
             random_state=seed
         )
@@ -117,7 +121,7 @@ class CatBoostClassifier(BaseClassifier):
             # loss_function='CrossEntropy',  # 損失関数を設定
             # use_best_model=True,
             # early_stopping_rounds=500,
-            early_stopping_rounds=50, #optunaはこっち
+            early_stopping_rounds=100, #optunaはこっち
             **model_config,
             random_seed=seed,
             eval_metric="AUC",
@@ -132,3 +136,63 @@ class CatBoostClassifier(BaseClassifier):
 
     def feature_importance(self):
         return self.model.get_feature_importance()
+    
+class CatBoostRegressor(BaseRegressor):
+    def __init__(self, input_dim, output_dim, model_config, verbose, seed=None) -> None:
+        super().__init__(input_dim, output_dim, model_config, verbose)
+
+        self.model = cat.CatBoostClassifier(
+            loss_function='Logloss',
+            # loss_function='CrossEntropy',  # 損失関数を設定
+            # use_best_model=True,
+            # early_stopping_rounds=500,
+            early_stopping_rounds=100, #optunaはこっち
+            **model_config,
+            random_seed=seed,
+            eval_metric="AUC",
+        )
+
+    def fit(self, X, y, eval_set):
+        self._column_names = X.columns
+        X, y = check_X_y(X, y)
+        
+        train_pool = cat.Pool(X, y)
+        eval_pools = [cat.Pool(X_val.values if isinstance(X_val, pd.DataFrame) else X_val, y_val) for X_val, y_val in eval_set]
+
+        self.model.fit(
+            train_pool,
+            eval_set=eval_pools,
+            use_best_model=True,
+            early_stopping_rounds=75,
+        )
+        best_iteration = self.model.get_best_iteration()
+        
+        best_score = self.model.get_best_score()
+
+        print(f"Best iteration: {best_iteration}")
+        print(f"Best score: {best_score}")
+
+    def feature_importance(self):
+        return self.model.get_feature_importance()
+
+class LogisticRegressionClassifier(BaseClassifier):
+    def __init__(self, input_dim, output_dim, model_config, verbose, seed=None) -> None:
+        super().__init__(input_dim, output_dim, model_config, verbose)
+        
+        #model_configからの設定を使用してロジスティック回帰を初期化
+        self.model = LogisticRegression(**model_config)
+
+
+    def fit(self, X, y, eval_set=None):
+        self._column_names = X.columns
+        # Xとyが適切な形状を持つことを確認
+        X, y = check_X_y(X, y)
+        
+        # 訓練データでモデルを実装
+        self.model.fit(X, y)
+        
+        if self.verbose > 0:
+            print("Model fitted with training data.")
+
+    def feature_importance(self):
+        return self.model.coef_
